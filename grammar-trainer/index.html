@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,600;6..72,700&display=swap" rel="stylesheet">
+  <title>Sentence Structure Trainer</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6f1;
+      --paper: #ffffff;
+      --paper-2: #ebeee8;
+      --ink: #172521;
+      --muted: #54635e;
+      --line: #cbd3cd;
+      --accent: #087b68;
+      --accent-strong: #045e50;
+      --accent-soft: #d9f3eb;
+      --warm: #be5b38;
+      --warm-soft: #fbe4d9;
+      --good: #187451;
+      --good-soft: #def3e8;
+      --bad: #ad432b;
+      --bad-soft: #fae2dc;
+      --focus: #0f7768;
+      --shadow: 0 18px 50px rgba(29, 54, 46, .10);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #111816;
+        --paper: #1a2421;
+        --paper-2: #222d29;
+        --ink: #edf3f0;
+        --muted: #b2c0ba;
+        --line: #3a4944;
+        --accent: #67d2bd;
+        --accent-strong: #94e5d4;
+        --accent-soft: #183d35;
+        --warm: #f09b76;
+        --warm-soft: #492b22;
+        --good: #73d8aa;
+        --good-soft: #193a2c;
+        --bad: #ff9b85;
+        --bad-soft: #47271f;
+        --focus: #8be0ce;
+        --shadow: 0 22px 60px rgba(0, 0, 0, .28);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        linear-gradient(var(--line) 1px, transparent 1px) 0 0 / 100% 32px,
+        var(--bg);
+      color: var(--ink);
+      font-family: "Atkinson Hyperlegible Next", sans-serif;
+      font-size: 17px;
+      line-height: 1.5;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+    .shell { width: min(1020px, calc(100% - 32px)); margin: 0 auto; padding: 44px 0 80px; }
+    .intro { display: grid; grid-template-columns: 1.15fr .85fr; gap: 38px; align-items: end; margin-bottom: 30px; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      margin-bottom: 14px;
+      max-width: 760px;
+      font-family: "Newsreader", serif;
+      font-size: clamp(2.55rem, 6vw, 4.9rem);
+      line-height: .96;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+    }
+    .lead { margin: 0; max-width: 620px; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); }
+    .promise {
+      margin: 0;
+      border-top: 3px solid var(--warm);
+      padding: 16px 2px 0;
+      color: var(--muted);
+    }
+    .promise strong { color: var(--ink); display: block; font-size: 1.05rem; margin-bottom: 3px; }
+
+    .progress-panel {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .progress-copy { min-width: 0; }
+    .progress-copy strong { display: block; }
+    .progress-copy span { color: var(--muted); font-size: .94rem; }
+    .dots { display: grid; grid-template-columns: repeat(4, 28px); gap: 7px; flex: 0 0 auto; }
+    .dot { height: 8px; border-radius: 99px; background: var(--paper-2); border: 1px solid var(--line); }
+    .dot.done { background: var(--accent); border-color: var(--accent); }
+    .dot.current { background: var(--warm); border-color: var(--warm); }
+
+    .layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); gap: 18px; align-items: start; }
+    .lesson-nav { background: var(--paper); border: 1px solid var(--line); padding: 12px; position: sticky; top: 16px; }
+    .nav-heading { margin: 5px 8px 10px; font-size: .84rem; color: var(--muted); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+    .lesson-btn {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      align-items: center;
+      gap: 9px;
+      padding: 11px 10px;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      border-radius: 7px;
+    }
+    .lesson-btn:hover { background: var(--paper-2); }
+    .lesson-btn.active { background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; }
+    .lesson-btn .num { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid var(--line); border-radius: 50%; font-size: .86rem; }
+    .lesson-btn.active .num { border-color: var(--accent); background: var(--paper); }
+    .lesson-btn .check { color: var(--good); font-weight: 700; visibility: hidden; }
+    .lesson-btn.complete .check { visibility: visible; }
+
+    .trainer { min-width: 0; }
+    .card { background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow); overflow: hidden; }
+    .card-top { padding: 26px 28px 18px; border-bottom: 1px solid var(--line); }
+    .context-row { display: flex; justify-content: space-between; gap: 14px; align-items: center; color: var(--muted); font-size: .92rem; }
+    .kind { color: var(--warm); font-weight: 700; }
+    .question-title { font-family: "Newsreader", serif; font-size: clamp(1.55rem, 4vw, 2.25rem); line-height: 1.08; margin: 14px 0 0; }
+    .activity { min-height: 300px; padding: 28px; }
+    .sentence {
+      margin: 0 0 24px;
+      padding: 22px;
+      background: var(--paper-2);
+      border-left: 4px solid var(--accent);
+      font-family: "Newsreader", serif;
+      font-size: clamp(1.35rem, 3.2vw, 1.8rem);
+      line-height: 1.35;
+    }
+    .hint { margin: -10px 0 20px; color: var(--muted); font-size: .95rem; }
+    .choices { display: grid; gap: 10px; }
+    .choice {
+      width: 100%;
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      min-height: 54px;
+      padding: 13px 15px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 7px;
+      font-weight: 600;
+      transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    }
+    .choice:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); transform: translateY(-1px); }
+    .choice:disabled { cursor: default; opacity: .72; }
+    .choice.correct { border-color: var(--good); background: var(--good-soft); color: var(--good); opacity: 1; }
+    .choice.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); opacity: 1; }
+    .choice .marker { display: inline-grid; place-items: center; width: 26px; height: 26px; margin-right: 10px; border: 1px solid currentColor; border-radius: 50%; font-size: .8rem; vertical-align: -1px; }
+    .token-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .token {
+      border: 1px solid var(--line);
+      background: var(--paper);
+      color: var(--ink);
+      padding: 12px 15px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-weight: 600;
+      min-height: 50px;
+    }
+    .token:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-soft); }
+    .token.selected { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-strong); }
+    .token:disabled { cursor: default; opacity: .72; }
+    .token.correct { background: var(--good-soft); border-color: var(--good); color: var(--good); opacity: 1; }
+    .token.wrong { background: var(--bad-soft); border-color: var(--bad); color: var(--bad); opacity: 1; }
+    .build-zone { min-height: 74px; border: 2px dashed var(--line); padding: 11px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 18px; }
+    .build-zone.empty::before { content: "Tap words below to build the sentence"; color: var(--muted); padding: 8px; }
+    .build-chip { border: 0; background: var(--accent-soft); color: var(--accent-strong); font-weight: 700; padding: 10px 12px; border-radius: 5px; cursor: pointer; }
+    .word-bank { display: flex; flex-wrap: wrap; gap: 9px; }
+    .word { border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 10px 13px; border-radius: 5px; cursor: pointer; }
+    .word:hover { border-color: var(--accent); }
+    .word:disabled { opacity: .28; cursor: default; }
+    .build-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .primary, .secondary {
+      border: 0;
+      min-height: 48px;
+      padding: 11px 18px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .primary { background: var(--accent); color: #fff; }
+    .primary:hover { background: var(--accent-strong); }
+    .primary:disabled { opacity: .45; cursor: default; }
+    .secondary { background: var(--paper-2); color: var(--ink); border: 1px solid var(--line); }
+    .feedback {
+      margin-top: 22px;
+      padding: 18px 20px;
+      border-top: 3px solid var(--good);
+      background: var(--good-soft);
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.try { border-color: var(--bad); background: var(--bad-soft); }
+    .feedback h3 { font-size: 1.12rem; margin-bottom: 5px; }
+    .feedback p { margin: 0; color: var(--ink); }
+    .formula { margin-top: 11px; display: flex; flex-wrap: wrap; gap: 7px; align-items: center; font-size: .92rem; }
+    .formula span { background: var(--paper); border: 1px solid var(--line); padding: 5px 8px; border-radius: 4px; font-weight: 700; }
+    .next-bar { padding: 17px 28px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 15px; align-items: center; background: var(--paper-2); }
+    .next-bar small { color: var(--muted); }
+    #nextBtn { display: none; }
+    #nextBtn.show { display: inline-block; }
+
+    .lesson-note { margin-top: 18px; padding: 18px 20px; border: 1px solid var(--line); background: color-mix(in srgb, var(--paper) 78%, transparent); }
+    .lesson-note h2 { font-family: "Newsreader", serif; font-size: 1.35rem; margin-bottom: 5px; }
+    .lesson-note p { color: var(--muted); margin: 0; }
+
+    @media (max-width: 760px) {
+      .shell { width: min(100% - 22px, 680px); padding-top: 28px; }
+      .intro { grid-template-columns: 1fr; gap: 22px; align-items: start; }
+      h1 { font-size: clamp(2.45rem, 12.5vw, 4rem); }
+      .promise { max-width: 520px; }
+      .layout { grid-template-columns: 1fr; }
+      .lesson-nav { position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+      .nav-heading { grid-column: 1 / -1; }
+      .lesson-btn { grid-template-columns: 28px 1fr; padding: 9px; }
+      .lesson-btn .check { display: none; }
+      .card-top, .activity { padding-left: 19px; padding-right: 19px; }
+      .next-bar { padding: 15px 19px; }
+      .sentence { padding: 18px; }
+    }
+    @media (max-width: 450px) {
+      body { font-size: 16px; }
+      .progress-panel { align-items: flex-start; }
+      .dots { grid-template-columns: repeat(4, 20px); }
+      .lesson-nav { grid-template-columns: 1fr; }
+      .lesson-btn { grid-template-columns: 28px 1fr auto; }
+      .lesson-btn .check { display: block; }
+      .context-row { align-items: flex-start; }
+      .activity { min-height: 340px; }
+      .next-bar { align-items: flex-start; flex-direction: column; }
+      #nextBtn { width: 100%; }
+      .build-actions { flex-direction: column; }
+      .build-actions button { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">See the structure.<br>Build better sentences.</h1>
+        <p class="lead">Learn by choosing, arranging, and repairing real sentences—no typing required.</p>
+      </div>
+      <p class="promise"><strong>Four short lessons</strong>Each one teaches a rule, lets you use it, and explains the answer immediately.</p>
+    </section>
+
+    <section class="progress-panel" aria-label="Session progress">
+      <div class="progress-copy">
+        <strong id="progressTitle">Session progress: 0 of 4 lessons</strong>
+        <span id="progressDetail">Start anywhere. Your progress lasts while this page is open.</span>
+      </div>
+      <div class="dots" id="progressDots" aria-hidden="true"></div>
+    </section>
+
+    <div class="layout">
+      <nav class="lesson-nav" aria-label="Choose a lesson">
+        <p class="nav-heading">Choose a lesson</p>
+        <button class="lesson-btn active" data-lesson="0"><span class="num">1</span><span>Sentence core</span><span class="check">✓</span></button>
+        <button class="lesson-btn" data-lesson="1"><span class="num">2</span><span>Building blocks</span><span class="check">✓</span></button>
+        <button class="lesson-btn" data-lesson="2"><span class="num">3</span><span>Complete thoughts</span><span class="check">✓</span></button>
+        <button class="lesson-btn" data-lesson="3"><span class="num">4</span><span>Clauses &amp; commas</span><span class="check">✓</span></button>
+      </nav>
+
+      <section class="trainer" aria-live="polite">
+        <article class="card">
+          <header class="card-top">
+            <div class="context-row">
+              <span class="kind" id="kindLabel">SPOT THE PART</span>
+              <span id="stepLabel">Question 1 of 4</span>
+            </div>
+            <h2 class="question-title" id="questionTitle">Tap the complete subject.</h2>
+          </header>
+          <div class="activity" id="activity"></div>
+          <footer class="next-bar">
+            <small id="nextHint">Choose an answer to see why it works.</small>
+            <button class="primary" id="nextBtn">Next question</button>
+          </footer>
+        </article>
+        <aside class="lesson-note">
+          <h2 id="lessonNoteTitle">The sentence core</h2>
+          <p id="lessonNoteText">Every complete sentence needs a subject—who or what it is about—and a predicate—what the subject does or is.</p>
+        </aside>
+      </section>
+    </div>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  var lessons = [
+    {
+      name: "Sentence core",
+      noteTitle: "The sentence core",
+      note: "Every complete sentence needs a subject—who or what it is about—and a predicate—what the subject does or is.",
+      questions: [
+        { type: "select", kind: "SPOT THE PART", prompt: "Tap the complete subject.", sentence: "The old red tractor rattled down the road.", choices: ["The old red tractor", "tractor rattled", "rattled down the road"], answer: 0, explain: "The complete subject includes the main noun, tractor, and every word describing it.", formula: ["The old red tractor", "+", "rattled down the road"] },
+        { type: "select", kind: "SPOT THE PART", prompt: "Tap the complete predicate.", sentence: "My neighbor's dog barks at delivery trucks.", choices: ["My neighbor's dog", "dog barks", "barks at delivery trucks"], answer: 2, explain: "The complete predicate starts with the verb and includes everything that tells what the dog does.", formula: ["My neighbor's dog", "+", "barks at delivery trucks"] },
+        { type: "select", kind: "FIND THE VERB", prompt: "Which word is the main verb?", sentence: "A narrow trail winds through the canyon.", choices: ["narrow", "trail", "winds", "canyon"], answer: 2, explain: "Winds shows the action. It tells what the trail does.", formula: ["subject: trail", "+", "verb: winds"] },
+        { type: "choose", kind: "CHECK THE CORE", prompt: "Which sentence has a clear subject and predicate?", choices: ["After the long drive.", "The tired hikers rested beside the creek.", "Resting beside the creek."], answer: 1, explain: "The tired hikers is the subject. Rested beside the creek is the predicate. Together they form a complete thought.", formula: ["The tired hikers", "+", "rested beside the creek"] }
+      ]
+    },
+    {
+      name: "Building blocks",
+      noteTitle: "Words work in teams",
+      note: "Nouns name people, places, things, or ideas. Verbs show action or being. Adjectives and adverbs add useful detail.",
+      questions: [
+        { type: "select", kind: "NAME THE JOB", prompt: "Which word is the noun?", sentence: "Bright lanterns glowed softly.", choices: ["Bright", "lanterns", "glowed", "softly"], answer: 1, explain: "Lanterns names things, so it is the noun. Bright describes the lanterns.", formula: ["bright → adjective", "lanterns → noun"] },
+        { type: "select", kind: "NAME THE JOB", prompt: "Which word is the adverb?", sentence: "Maya carefully measured the board.", choices: ["Maya", "carefully", "measured", "board"], answer: 1, explain: "Carefully tells how Maya measured. Words that modify a verb often end in -ly.", formula: ["measured → verb", "carefully → how"] },
+        { type: "build", kind: "BUILD A SENTENCE", prompt: "Build a clear sentence in the correct order.", words: ["finished", "Luke", "the report", "carefully"], answerWords: ["Luke", "carefully", "finished", "the report"], explain: "English sentences usually place the subject before the verb. An adverb like carefully can sit between them.", formula: ["subject", "+", "adverb", "+", "verb", "+", "object"] },
+        { type: "choose", kind: "CHOOSE THE CLEAREST", prompt: "Which sentence uses description most clearly?", choices: ["The blue bicycle leaned against the brick wall.", "The bicycle blue leaned wall brick against.", "The bicycle leaned very, really, extremely nicely."], answer: 0, explain: "Useful adjectives sit close to the nouns they describe: blue bicycle and brick wall.", formula: ["adjective + noun", "+", "verb", "+", "adjective + noun"] }
+      ]
+    },
+    {
+      name: "Complete thoughts",
+      noteTitle: "Finish the thought",
+      note: "A fragment is missing a subject, a complete predicate, or a finished thought. A run-on jams complete sentences together without proper punctuation.",
+      questions: [
+        { type: "choose", kind: "FRAGMENT OR SENTENCE?", prompt: "Which one is a complete sentence?", choices: ["Because the storm arrived early.", "The storm arrived early.", "Arriving before sunset."], answer: 1, explain: "The storm arrived early has a subject, a verb, and a complete thought. Because makes the first option feel unfinished.", formula: ["The storm", "+", "arrived early", "= complete"] },
+        { type: "choose", kind: "REPAIR THE FRAGMENT", prompt: "Choose the best repair.", sentence: "While we waited for the bus.", choices: ["While we waited for the bus, the rain stopped.", "We while waited for the bus.", "While, we waited, for the bus."], answer: 0, explain: "While introduces a dependent idea. Adding the rain stopped gives it an independent clause to lean on.", formula: ["dependent clause", "+", "independent clause"] },
+        { type: "choose", kind: "REPAIR THE RUN-ON", prompt: "Choose the best repair.", sentence: "The meeting ended we packed our notes.", choices: ["The meeting ended, we packed our notes.", "The meeting ended, and we packed our notes.", "The meeting, ended and we, packed our notes."], answer: 1, explain: "These are two complete thoughts. A comma plus and joins them correctly.", formula: ["complete thought", "+ , and +", "complete thought"] },
+        { type: "select", kind: "DIAGNOSE IT", prompt: "What kind of sentence is this?", sentence: "Running through the airport with two heavy bags.", choices: ["Complete sentence", "Fragment", "Run-on"], answer: 1, explain: "Running tells us an action, but the sentence never says who is running or finishes the thought.", formula: ["missing subject", "+", "unfinished thought"] }
+      ]
+    },
+    {
+      name: "Clauses & commas",
+      noteTitle: "Join ideas with purpose",
+      note: "An independent clause can stand alone. A dependent clause cannot. Commas help readers see how the ideas fit together.",
+      questions: [
+        { type: "select", kind: "FIND THE CLAUSE", prompt: "Which part can stand alone as a sentence?", sentence: "Although the shop was closed, we waited outside.", choices: ["Although the shop was closed", "we waited outside", "Although the shop"], answer: 1, explain: "We waited outside expresses a complete thought. The word although makes the other clause depend on more information.", formula: ["Although… → dependent", "we waited… → independent"] },
+        { type: "choose", kind: "PLACE THE COMMA", prompt: "Which sentence is punctuated correctly?", choices: ["After the game we ordered pizza.", "After the game, we ordered pizza.", "After, the game we ordered, pizza."], answer: 1, explain: "A comma separates the opening phrase, After the game, from the main sentence.", formula: ["opening phrase", "+ comma +", "main sentence"] },
+        { type: "build", kind: "JOIN THE IDEAS", prompt: "Build one smooth sentence.", words: ["we stayed inside", "because", "the wind was strong", "."], answerWords: ["we stayed inside", "because", "the wind was strong", "."], explain: "Because explains why we stayed inside. No comma is needed when this dependent clause comes second.", formula: ["main idea", "+ because +", "reason"] },
+        { type: "choose", kind: "VARY THE RHYTHM", prompt: "Which version gives the ideas the smoothest rhythm?", choices: ["I checked the numbers. I found the error. I fixed the report.", "After I checked the numbers, I found the error and fixed the report.", "Checking numbers error report fixed found."], answer: 1, explain: "The second version connects related actions without becoming a run-on. Its opening clause also varies the rhythm.", formula: ["opening clause", "+", "two linked actions"] }
+      ]
+    }
+  ];
+
+  var state = {
+    lesson: 0,
+    question: 0,
+    answered: false,
+    completed: [false, false, false, false],
+    buildOrder: []
+  };
+
+  var activity = document.getElementById("activity");
+  var questionTitle = document.getElementById("questionTitle");
+  var kindLabel = document.getElementById("kindLabel");
+  var stepLabel = document.getElementById("stepLabel");
+  var nextBtn = document.getElementById("nextBtn");
+  var nextHint = document.getElementById("nextHint");
+  var noteTitle = document.getElementById("lessonNoteTitle");
+  var noteText = document.getElementById("lessonNoteText");
+
+  function currentQuestion() { return lessons[state.lesson].questions[state.question]; }
+
+  function safeText(value) {
+    return String(value).replace(/[&<>'"]/g, function (c) {
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[c];
+    });
+  }
+
+  function render() {
+    var lesson = lessons[state.lesson];
+    var q = currentQuestion();
+    state.answered = false;
+    state.buildOrder = [];
+    kindLabel.textContent = q.kind;
+    stepLabel.textContent = "Question " + (state.question + 1) + " of " + lesson.questions.length;
+    questionTitle.textContent = q.prompt;
+    noteTitle.textContent = lesson.noteTitle;
+    noteText.textContent = lesson.note;
+    nextBtn.classList.remove("show");
+    nextHint.textContent = q.type === "build" ? "Arrange every piece, then check your answer." : "Choose an answer to see why it works.";
+
+    var html = "";
+    if (q.sentence) html += '<blockquote class="sentence">' + safeText(q.sentence) + '</blockquote>';
+
+    if (q.type === "select" || q.type === "choose") {
+      html += '<div class="choices" role="group" aria-label="Answer choices">';
+      q.choices.forEach(function (choice, i) {
+        html += '<button class="choice" data-answer="' + i + '"><span class="marker">' + String.fromCharCode(65 + i) + '</span>' + safeText(choice) + '</button>';
+      });
+      html += '</div>';
+    } else if (q.type === "build") {
+      html += '<div class="build-zone empty" id="buildZone" aria-label="Your sentence"></div>';
+      html += '<p class="hint">Tap a placed piece to return it.</p>';
+      html += '<div class="word-bank" id="wordBank" aria-label="Word choices">';
+      q.words.forEach(function (word, i) {
+        html += '<button class="word" data-word-index="' + i + '">' + safeText(word) + '</button>';
+      });
+      html += '</div><div class="build-actions"><button class="primary" id="checkBuild" disabled>Check sentence</button><button class="secondary" id="clearBuild">Start over</button></div>';
+    }
+    html += '<div class="feedback" id="feedback" role="status"></div>';
+    activity.innerHTML = html;
+    bindActivity();
+    updateNavigation();
+  }
+
+  function bindActivity() {
+    var q = currentQuestion();
+    if (q.type === "select" || q.type === "choose") {
+      Array.prototype.forEach.call(activity.querySelectorAll(".choice"), function (btn) {
+        btn.addEventListener("click", function () { gradeChoice(Number(btn.dataset.answer)); });
+      });
+    } else {
+      Array.prototype.forEach.call(activity.querySelectorAll(".word"), function (btn) {
+        btn.addEventListener("click", function () { addWord(Number(btn.dataset.wordIndex)); });
+      });
+      document.getElementById("clearBuild").addEventListener("click", clearBuild);
+      document.getElementById("checkBuild").addEventListener("click", gradeBuild);
+    }
+  }
+
+  function gradeChoice(chosen) {
+    if (state.answered) return;
+    var q = currentQuestion();
+    state.answered = true;
+    Array.prototype.forEach.call(activity.querySelectorAll(".choice"), function (btn) {
+      var idx = Number(btn.dataset.answer);
+      btn.disabled = true;
+      if (idx === q.answer) btn.classList.add("correct");
+      if (idx === chosen && chosen !== q.answer) btn.classList.add("wrong");
+    });
+    showFeedback(chosen === q.answer, q);
+  }
+
+  function addWord(index) {
+    if (state.answered || state.buildOrder.indexOf(index) !== -1) return;
+    state.buildOrder.push(index);
+    renderBuildZone();
+  }
+
+  function removeWord(index) {
+    if (state.answered) return;
+    state.buildOrder = state.buildOrder.filter(function (i) { return i !== index; });
+    renderBuildZone();
+  }
+
+  function clearBuild() {
+    if (state.answered) return;
+    state.buildOrder = [];
+    renderBuildZone();
+  }
+
+  function renderBuildZone() {
+    var q = currentQuestion();
+    var zone = document.getElementById("buildZone");
+    zone.innerHTML = "";
+    zone.classList.toggle("empty", state.buildOrder.length === 0);
+    state.buildOrder.forEach(function (index) {
+      var chip = document.createElement("button");
+      chip.className = "build-chip";
+      chip.textContent = q.words[index];
+      chip.addEventListener("click", function () { removeWord(index); });
+      zone.appendChild(chip);
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".word"), function (btn) {
+      btn.disabled = state.buildOrder.indexOf(Number(btn.dataset.wordIndex)) !== -1;
+    });
+    document.getElementById("checkBuild").disabled = state.buildOrder.length !== q.words.length;
+  }
+
+  function gradeBuild() {
+    if (state.answered) return;
+    var q = currentQuestion();
+    var result = state.buildOrder.map(function (i) { return q.words[i]; });
+    var correct = JSON.stringify(result) === JSON.stringify(q.answerWords);
+    if (!correct) {
+      var feedback = document.getElementById("feedback");
+      feedback.className = "feedback show try";
+      feedback.innerHTML = '<h3>Not quite—look for the subject first.</h3><p>Tap any placed piece to move it back, then try a different order.</p>';
+      return;
+    }
+    state.answered = true;
+    Array.prototype.forEach.call(activity.querySelectorAll(".word, .build-chip, #clearBuild, #checkBuild"), function (btn) { btn.disabled = true; });
+    showFeedback(true, q);
+  }
+
+  function showFeedback(correct, q) {
+    var feedback = document.getElementById("feedback");
+    var heading = correct ? "Exactly." : "Good try—here’s the pattern.";
+    feedback.className = "feedback show" + (correct ? "" : " try");
+    var formula = '<div class="formula" aria-label="Sentence pattern">' + q.formula.map(function (part) { return '<span>' + safeText(part) + '</span>'; }).join("") + '</div>';
+    feedback.innerHTML = '<h3>' + heading + '</h3><p>' + safeText(q.explain) + '</p>' + formula;
+    nextBtn.classList.add("show");
+    nextHint.textContent = correct ? "You found the pattern." : "The correct answer is highlighted.";
+  }
+
+  function advance() {
+    var lesson = lessons[state.lesson];
+    if (state.question < lesson.questions.length - 1) {
+      state.question += 1;
+    } else {
+      state.completed[state.lesson] = true;
+      var nextIncomplete = state.completed.indexOf(false);
+      if (nextIncomplete !== -1) {
+        state.lesson = nextIncomplete;
+        state.question = 0;
+      } else {
+        state.question = 0;
+      }
+    }
+    render();
+    document.querySelector(".card").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function updateNavigation() {
+    Array.prototype.forEach.call(document.querySelectorAll(".lesson-btn"), function (btn) {
+      var idx = Number(btn.dataset.lesson);
+      btn.classList.toggle("active", idx === state.lesson);
+      btn.classList.toggle("complete", state.completed[idx]);
+    });
+    var done = state.completed.filter(Boolean).length;
+    document.getElementById("progressTitle").textContent = "Session progress: " + done + " of 4 lessons";
+    document.getElementById("progressDetail").textContent = done === 4 ? "All four lessons complete. Replay any lesson to sharpen the skill." : "Start anywhere. Your progress lasts while this page is open.";
+    var dots = document.getElementById("progressDots");
+    dots.innerHTML = "";
+    state.completed.forEach(function (complete, i) {
+      var dot = document.createElement("span");
+      dot.className = "dot" + (complete ? " done" : (i === state.lesson ? " current" : ""));
+      dots.appendChild(dot);
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll(".lesson-btn"), function (btn) {
+    btn.addEventListener("click", function () {
+      state.lesson = Number(btn.dataset.lesson);
+      state.question = 0;
+      render();
+    });
+  });
+  nextBtn.addEventListener("click", advance);
+  render();
+}());
+</script>
+</body>
+</html>
